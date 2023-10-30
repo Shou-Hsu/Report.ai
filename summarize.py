@@ -44,7 +44,7 @@ class generate_summary():
             ------------\n"""
             f"Given the new context, refine the original {items}"
             f"If the context isn't useful, return the origin {items}"
-            f"Fulfill the format below: \n {item_format}"
+            f"Fulfill the format: ```{item_format}```"
     )
         refine_prompt = PromptTemplate.from_template(refine_template)
 
@@ -72,7 +72,7 @@ class generate_summary():
         prompt_template = f"Find out or extract the {items} according to the information provided in the following text behind ###.\
                             Remember, you are being trained to find outor extract specific information without fail so you must \
                             ensure that they are all presented in the specified format below: \n"\
-                            "Subtopic:-||-,"\
+                            "Subtopic: ,"\
                             f'{format}'\
                             """```{text}```"""
 

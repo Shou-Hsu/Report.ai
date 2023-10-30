@@ -1,27 +1,20 @@
 import docx, difflib ,re , os
 import validators, shutil
 
-# def convert_json(txt:str, item_list:list) -> str:
-#     from langchain.chains import create_extraction_chain
-#     from utils import llm
-
-#     # Schema
-#     properties = dict()
-#     for item in item_list: properties[item] = {"type": "string"}
-
-#     schema = {
-#         "properties": properties,
-#         "required": item_list,
-#     }
-
-#     chain = create_extraction_chain(schema, llm)
-    
-#     return chain.run(txt)
-    
 def convert_json(txt:str, item_list:list) -> str:
+    txt = txt.replace('\n', '').replace('#', '')
+
     output = dict()
-    for item in item_list:
-        output[item] = txt.split(item + ":")[1].strip().split('\n')[0]
+    for i in range(len(item_list)):
+        start = txt.lower().find(item_list[i].lower() + ':')
+
+        if i != len(item_list) - 1: 
+            end = txt.lower().find(item_list[i+1].lower() + ':')
+        else:
+            end = len(txt)
+
+        output[item_list[i]] = txt[start + len(item_list[i]) + 1 : end].strip()
+
     return output
 
 def fuzzy_match(source:str, target:str, cutoff:float=0.1) -> float:
@@ -78,7 +71,7 @@ def get_items(type:str):
     item_list = ''.join(lines).split(',') 
     item_list = [items.strip() for items in item_list]
     item_format = ''
-    for i in item_list: item_format += f'{i}: -||-\n'
+    for i in item_list: item_format += f'{i}:'
 
     return item_list, item, item_format
 
