@@ -44,17 +44,17 @@ At Report.ai, our mission is clear: to empower you with a robust AI-driven repor
 
 ### Download the audio from Youtube and convert to transcipt with timestamp
 <a href="https://youtu.be/RSNWOGQTsns">
-  <img src="https://img.youtube.com/vi/RSNWOGQTsns/maxresdefault.jpg" alt="Video Preview" width="50%">
+  <img src="https://img.youtube.com/vi/RSNWOGQTsns/maxresdefault.jpg" alt="Video Preview" width="80%">
 </a>
 
 ### Analyze the content using customized template.
 <a href="https://youtu.be/DBJqP350uu4">
-  <img src="https://img.youtube.com/vi/DBJqP350uu4/maxresdefault.jpg" alt="Video Preview" width="50%">
+  <img src="https://img.youtube.com/vi/DBJqP350uu4/maxresdefault.jpg" alt="Video Preview" width="80%">
 </a>
 
 ### The output report
 <a href="https://youtu.be/dxRgrQZRJPY">
-  <img src="https://img.youtube.com/vi/dxRgrQZRJPY/maxresdefault.jpg" alt="Video Preview" width="50%">
+  <img src="https://img.youtube.com/vi/dxRgrQZRJPY/maxresdefault.jpg" alt="Video Preview" width="80%">
 </a>
 
 ---
