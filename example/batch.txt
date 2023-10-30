@@ -1,0 +1,2 @@
+./example/WATCH_LIVE_Nvidia_Q2_Earnings_Call_NVDA.txt,
+https://www.youtube.com/watch?v=H1bipV2NMgs&t=2s
