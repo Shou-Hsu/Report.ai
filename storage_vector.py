@@ -39,5 +39,4 @@ def chroma_storage(file_name:str, collection_name:str='my-collection', persist_d
             doc = Document(page_content=content , metadata={"source": file_name})
             docs.append(doc)
 
-    if not os.path.exists(persist_directory): os.mkdir(persist_directory)
     Chroma.from_documents(docs, embeddings, persist_directory=persist_directory, collection_name=collection_name)

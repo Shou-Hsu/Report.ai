@@ -42,7 +42,7 @@ class divide_article():
         for paragraph in paragraphs.get('Subtopics'):
             # seperate transcript to word list
             if self.language == 'en': word_list = [self._string_cleaner(word).lower() for word in paragraph.get('transcript').split(' ') if self._string_cleaner(word)]
-            else: word_list = [word for word in re.split(r'[:.?!，。]', paragraph.get('Transcript'))[0]]
+            else: word_list = [word for word in re.split(r'[:.?!，。,]', paragraph.get('transcript'))[0]]
 
             start, end = 'undifine', 'undifine'
             index_w = 0

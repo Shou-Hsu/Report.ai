@@ -13,7 +13,7 @@ def main():
     parser.add_argument('-b', '--batch', default=False, action="store_true", help='batch process')
     parser.add_argument('-e', '--extract', default=False, action="store_true", help='Extract human voice from audio (not support in Apple silicon)')
     parser.add_argument('-o', '--output_dir', default='./docx', type=str, help='file path of output report')
-    parser.add_argument('-v', '--vectorDB', default=None, choices=['pinecone, chroma', None], help='select the vectorDB')
+    parser.add_argument('-v', '--vectorDB', default=None, choices=['pinecone', 'chroma', None], help='select the vectorDB')
     parser.add_argument('-m', '--model', type=str, default='medium', help='the using model for ASR',
                         choices=['tiny', 'base', 'small', 'medium', 'large-v2'])
 

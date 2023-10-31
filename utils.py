@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import docx, difflib ,re , os
 import validators, shutil
 
@@ -22,12 +23,14 @@ def fuzzy_match(source:str, target:str, cutoff:float=0.1) -> float:
 
     return difflib.get_close_matches(target, source, n=1, cutoff=cutoff)
 
-def validation_and_filetype_check(file_path:str, output_dir:str) ->str:
+def validation_and_filetype_check(file_path:str, output_dir:str='./docx') ->str:
+    load_dotenv()
+    
+    if not os.path.exists(os.getenv('PERSIST_DIR')): os.mkdir(os.getenv('PERSIST_DIR'))
+    if not os.path.exists('./transcript'): os.mkdir('./transcript')
+    if not os.path.exists('./summary'): os.mkdir('./summary')
     if not os.path.exists(output_dir): os.mkdir(output_dir)
     if not os.path.exists('./audio'): os.mkdir('./audio')
-    if not os.path.exists('./transcript'): os.mkdir('./transcript')
-    if not os.path.exists('./chroma_db'): os.mkdir('./chroma_db')
-    if not os.path.exists('./summary'): os.mkdir('./summary')
 
     # validate input is url or not
     if validators.url(str(file_path)): return 'url', file_path
@@ -114,7 +117,6 @@ def credential_validation(vectorDB:str=False, temperature:float=0.1) -> None:
     from langchain.embeddings.openai import OpenAIEmbeddings
     from langchain.chat_models import AzureChatOpenAI
     from langchain.chat_models import ChatOpenAI
-    from dotenv import load_dotenv
 
     load_dotenv()
     # validate llm
