@@ -204,7 +204,10 @@ conda install -c conda-forge ffmpeg libsndfile
 pip install -r requirements.txt
 ```
 
-
+9. (Mac Only) Update the dependencies:
+```sh
+pip install -U numba
+```
 ### 🤖 Running Report.ai
 
 ```sh

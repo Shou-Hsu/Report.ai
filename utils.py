@@ -24,9 +24,7 @@ def fuzzy_match(source:str, target:str, cutoff:float=0.1) -> float:
     return difflib.get_close_matches(target, source, n=1, cutoff=cutoff)
 
 def validation_and_filetype_check(file_path:str, output_dir:str='./docx') ->str:
-    load_dotenv()
     
-    if not os.path.exists(os.getenv('PERSIST_DIR')): os.mkdir(os.getenv('PERSIST_DIR'))
     if not os.path.exists('./transcript'): os.mkdir('./transcript')
     if not os.path.exists('./summary'): os.mkdir('./summary')
     if not os.path.exists(output_dir): os.mkdir(output_dir)

@@ -26,7 +26,11 @@ def pinecone_storage(file_name:str) -> None:
 
 def chroma_storage(file_name:str, collection_name:str='my-collection', persist_directory:str='chroma_db') -> None:
     from langchain.vectorstores import Chroma
+    from dotenv import load_dotenv
     from utils import embeddings
+
+    load_dotenv()
+    if not os.path.exists(os.getenv('PERSIST_DIR')): os.mkdir(os.getenv('PERSIST_DIR'))
 
     with open(f"./summary/{file_name}.json", "r") as f: summary = json.load(f)
 
