@@ -11,6 +11,7 @@ def main():
     parser.add_argument('-c', '--chunk', default=2000, type=int, help='chunk size')
     parser.add_argument('-t', '--temperature', default=0.1, type=float, help='temperature of LLM')
     parser.add_argument('-b', '--batch', default=False, action="store_true", help='batch process')
+    parser.add_argument('-l', '--translated_language', default='zh-tw', help='the language that should be translated')
     parser.add_argument('-e', '--extract', default=False, action="store_true", help='Extract human voice from audio (not support in Apple silicon)')
     parser.add_argument('-o', '--output_dir', default='./docx', type=str, help='file path of output report')
     parser.add_argument('-v', '--vectorDB', default=None, choices=['pinecone', 'chroma', None], help='select the vectorDB')
@@ -40,8 +41,9 @@ def main():
             language = detect_language(file_path)
 
         # divide the article and generate summary
-        article_divided = divide_article(file_name=file_name, language=language, chunk_size=args.chunk).run()
-        generate_summary(file_name=file_name, language=language, chunk_size=args.chunk, output_dir=args.output_dir).run(article_divided)
+        article_divided = divide_article(file_name=file_name, original_language=language, chunk_size=args.chunk).run()
+        generate_summary(file_name=file_name, original_language=language, 
+            translated_language=args.translated_language, chunk_size=args.chunk, output_dir=args.output_dir).run(article_divided)
 
         # Pinecone only provide one index for free account
         if args.vectorDB == 'pinecone':
