@@ -15,6 +15,7 @@ class generate_summary():
         self.translated_language = translated_language
         self.output_dir = output_dir
         self.llm = llm
+        print(self.original_language, self.translated_language)
 
     def _get_general_summary(self, article_divided:dict) -> None:
         from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -36,11 +37,11 @@ class generate_summary():
 
         refine_template = (
             f"Your job is to produce a final streamline {items}.\
-            We have provided an existing {items} up to a certain point:""```{existing_answer}```\n"\
+            We have provided an existing {items} up to a certain point:""{existing_answer}\n"\
             f"We have the opportunity to refine {items}"
             "(only if needed) with some more context below.\n\
             ------------\n\
-            ```{text}```\n\
+            {text}\n\
             ------------\n"
             f"Given the new context, refine the original {items} in {self.original_language}\
             If the context isn't useful, return the origin {items} in {self.original_language}\
@@ -68,7 +69,8 @@ class generate_summary():
 
     def _translate_chinese(self, content:str) -> str:
         doc = Document(page_content=content, metadata={"source": self.file_name})
-        prompt_template = f"###You are an experienced translator who will translate {self.original_language} content into {self.translated_language} in a way that stays faithful to the original without adding much expansion or explanation.###" "{text}"
+        prompt_template = f"You are an experienced translator who will translate {self.original_language} content into {self.translated_language}. \
+            You are translate text in a way that stays faithful to the original without adding much expansion and explanation." "{text}"
        
         prompt = PromptTemplate.from_template(prompt_template)
         llm_chain = LLMChain(llm=self.llm, prompt=prompt, return_final_only=True)
@@ -81,13 +83,13 @@ class generate_summary():
     def _get_subtopic_summary(self) -> None:
         item_list, items, item_format = get_items('individuel')
 
-        prompt_template = f"###Your primary focus should be on accurately identifying or extracting specific information.\
+        prompt_template = f"Your primary focus should be on accurately identifying or extracting specific information.\
                             ensure the {items} are all in {self.original_language}.\
-                            Find out or extract the {items} in {self.original_language} based on the information given in the subsequent text. \
+                            Find out or extract the {items} in {self.original_language} based on the information given in the text. \
                             Consequently, adhere to the designated format below:\
                             Subtopic:\
-                            {item_format}###"\
-                            "```{text}```"
+                            {item_format}"\
+                            "{text}"
 
         prompt = PromptTemplate.from_template(prompt_template)
 
@@ -159,8 +161,9 @@ class generate_summary():
                     document.add_paragraph(content)
 
                 # add chinese transcript
-                document.add_heading('translated transcript', level=3)
-                document.add_paragraph(subtopic.get("translated transcript").strip())
+                if self.original_language != self.translated_language:
+                    document.add_heading('translated transcript', level=3)
+                    document.add_paragraph(subtopic.get("translated transcript").strip())
                 document.add_heading('original transcript', level=3)
                 document.add_paragraph(subtopic.get('original transcript').strip())
 

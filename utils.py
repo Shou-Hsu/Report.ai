@@ -55,11 +55,11 @@ def validation_and_filetype_check(file_path:str, output_dir:str='./docx') ->str:
     else: raise ValueError(f'Please check {file_path} is existed or not')
 
 def detect_language(file_path:str) -> str:
-    from langdetect import detect
+    from langdetect import detect_langs
 
     with open(file_path,'r') as f:
         text = ''.join(f.readlines())
-    return detect(text)
+    return str(detect_langs(text)[0]).split(':')[0]
 
 def get_items(type:str):
     if type == 'individuel':
