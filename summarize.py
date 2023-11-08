@@ -3,6 +3,7 @@ from langchain.docstore.document import Document
 from langchain.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
 from utils import convert_json, get_items
+from langdetect import detect_langs
 from tqdm import tqdm
 import json
 
@@ -15,7 +16,6 @@ class generate_summary():
         self.translated_language = translated_language
         self.output_dir = output_dir
         self.llm = llm
-        print(self.original_language, self.translated_language)
 
     def _get_general_summary(self, article_divided:dict) -> None:
         from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -68,24 +68,27 @@ class generate_summary():
         self.article_full = {**output, **article_divided}
 
     def _translate_chinese(self, content:str) -> str:
-        doc = Document(page_content=content, metadata={"source": self.file_name})
-        prompt_template = f"You are an experienced translator who will translate {self.original_language} content into {self.translated_language}. \
-            You are translate text in a way that stays faithful to the original without adding much expansion and explanation." "{text}"
-       
-        prompt = PromptTemplate.from_template(prompt_template)
-        llm_chain = LLMChain(llm=self.llm, prompt=prompt, return_final_only=True)
+        if not content: return "N/A"
+        if str(detect_langs(content)[0]).split(':')[0] != self.translated_language:
+            doc = Document(page_content=content, metadata={"source": self.file_name})
+            prompt_template = f"You are an experienced translator who will translate the content into {self.translated_language} if the given text is not in {self.translated_language}. \
+                You will translate the given text in a way that stays faithful to the original without adding much expansion and explanation. You will only return the translated text" "{text}"
+        
+            prompt = PromptTemplate.from_template(prompt_template)
+            llm_chain = LLMChain(llm=self.llm, prompt=prompt, return_final_only=True)
 
-        stuff_translate_chain = StuffDocumentsChain(  
-            llm_chain=llm_chain, document_variable_name="text")
+            stuff_translate_chain = StuffDocumentsChain(  
+                llm_chain=llm_chain, document_variable_name="text")
 
-        return stuff_translate_chain.run([doc])
+            return stuff_translate_chain.run([doc])
+        else:
+            return content
 
     def _get_subtopic_summary(self) -> None:
         item_list, items, item_format = get_items('individuel')
 
         prompt_template = f"Your primary focus should be on accurately identifying or extracting specific information.\
-                            ensure the {items} are all in {self.original_language}.\
-                            Find out or extract the {items} in {self.original_language} based on the information given in the text. \
+                            Find out or extract the {items} based on the information given in the text. \
                             Consequently, adhere to the designated format below:\
                             Subtopic:\
                             {item_format}"\
@@ -133,7 +136,7 @@ class generate_summary():
         # translate general info and convert in docx
         items_list, _, _ = get_items('general')
         for item in items_list:
-            content = self._translate_chinese(self.article_full.get(item, 'N/A'))
+            content = self._translate_chinese(self.article_full.get(item))
             document.add_heading(item, level=1)
             document.add_paragraph(content)
 
@@ -141,7 +144,7 @@ class generate_summary():
         subtopics = self.article_full.get('Subtopics')
         with tqdm(total=len(subtopics)) as pbar:
             for subtopic in subtopics:
-                content = self._translate_chinese(subtopic.get('subtopic', 'N/A'))
+                content = self._translate_chinese(subtopic.get('subtopic'))
                 insertion = document.add_heading(content, level=2)
 
                 # add hyperlink
@@ -156,7 +159,7 @@ class generate_summary():
                 # translate individual item and convert in docx
                 items_list, _, _ = get_items('individuel')
                 for item in items_list:
-                    content = self._translate_chinese(subtopic.get(item, 'N/A'))
+                    content = self._translate_chinese(subtopic.get(item))
                     document.add_heading(item, level=3)
                     document.add_paragraph(content)
 
@@ -176,4 +179,6 @@ class generate_summary():
         self._get_subtopic_summary()
         
         # Translate and convert json to docx
+        # with open(f'./summary/{self.file_name}.json') as f: 
+        #     self.article_full = json.load(f)
         self._translate_convert_docx()

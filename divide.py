@@ -95,10 +95,11 @@ class divide_article():
         split_text = text_splitter.split_text(transcript)
 
         # Define prompt
-        prompt_template = "###The following text is part of an article, and your task is to identify and categorize its subtopics.\
+        prompt_template = "###You are a experimental researcher and \
+                            your task is to find out the subtopics and divide the article by subtopics.\
                             Please ensure that you do not overly fragment the content, and \
                             that each subtopic contains a sufficient amount of information.\
-                            Begin by identifying the subtopics within the text.\
+                            Begin by identifying the subtopics within the given text.\
                             Keep the context entirely unmodified and refrain from extending it in any way.\
                             Divide the given text into separate contexts based on the identified subtopics."\
                             f"Extract the first sentence from each context as a transcript in {self.original_language}."\

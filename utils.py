@@ -126,7 +126,9 @@ def credential_validation(vectorDB:str=False, temperature:float=0.1) -> None:
                               openai_api_version=os.getenv('AZURE_OPENAI_API_VERSION'),                            
                               deployment_name=os.getenv('AZURE_DEPLOYMENT_NAME'), 
                               temperature=temperature, 
-                              request_timeout=240)
+                              request_timeout=240,
+                              max_retries=10
+                            )       
         
         embeddings = OpenAIEmbeddings(openai_api_key=os.getenv('AZURE_OPENAI_API_KEY'),
                                       openai_api_base=os.getenv('AZURE_OPENAI_API_BASE'),
@@ -139,7 +141,7 @@ def credential_validation(vectorDB:str=False, temperature:float=0.1) -> None:
             openai_api_key=os.getenv('OPENAI_API_KEY'),
             model_name=os.getenv('MODEL_NAME'), 
             temperature=temperature, 
-            request_timeout=240
+            request_timeout=240,
             )
         embeddings = OpenAIEmbeddings()
         print('Initial OpenAI')

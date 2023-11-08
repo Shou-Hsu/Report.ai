@@ -16,7 +16,7 @@ def main():
     parser.add_argument('-o', '--output_dir', default='./docx', type=str, help='file path of output report')
     parser.add_argument('-v', '--vectorDB', default=None, choices=['pinecone', 'chroma', None], help='select the vectorDB')
     parser.add_argument('-m', '--model', type=str, default='medium', help='the using model for ASR',
-                        choices=['tiny', 'base', 'small', 'medium', 'large-v2'])
+                        choices=['tiny', 'base', 'small', 'medium', 'large-v3'])
 
     args = parser.parse_args()
 
