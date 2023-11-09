@@ -66,7 +66,7 @@ def speech2text(file_name:str, model_name:str="tiny", extraction:bool=False) -> 
     if extraction: extract_voice(file_name)
 
     # remove the silence of audio
-    # remove_silence(file_name)
+    remove_silence(file_name)
     
     # convert audio to text
     print('Start convert audio to text with timestamp')
