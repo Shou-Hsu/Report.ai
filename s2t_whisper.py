@@ -10,7 +10,7 @@ def download_from_vimeo(url:str) -> str:
     vimeo.best_stream.download(download_directory='./audio')
 
     # Convert the video to WAV format
-    clip = mp.AudioFileClip(f".audio/{file_name}.mp4", fps=16000)
+    clip = mp.AudioFileClip(f"./audio/{file_name}.mp4", fps=16000)
     clip.write_audiofile(f"./audio/{file_name}.wav")
     os.remove(f"./audio/{file_name}.mp4")
 
