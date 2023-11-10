@@ -1,6 +1,6 @@
 from utils import credential_validation, get_file_list, validation_and_filetype_check, detect_language
+from s2t_whisper import speech2text, download_from_youtube, download_from_vimeo
 from storage_vector import pinecone_storage, chroma_storage
-from s2t_whisper import speech2text, download_from_youtube
 from summarize import generate_summary
 from divide import divide_article
 import argparse, os
@@ -33,7 +33,8 @@ def main():
         print(f'Strat analysis {file_name}')
         if file_type == 'url':
             if file_path.__contains__('youtube'): file_name = download_from_youtube(file_path)
-            elif file_path.__contains__('vimeo'): file_name = download_from_youtube(file_path)
+            elif file_path.__contains__('vimeo'): file_name = download_from_vimeo(file_path)
+            else: raise ValueError(f"{file_path} is not supported. please make sure the url is on youtube or vimeo")
             language = speech2text(file_name=file_name, model_name=args.model, extraction=args.extract)
         elif file_type == 'audio':
             language = speech2text(file_name=file_name, model_name=args.model, extraction=args.extract)
