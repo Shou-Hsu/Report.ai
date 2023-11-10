@@ -1,6 +1,21 @@
 import os, re
 from VAD import extract_voice
 
+def download_from_vimeo(url:str) -> str:
+    from vimeo_downloader import Vimeo
+    import moviepy.editor as mp
+
+    vimeo = Vimeo(url)   
+    file_name = vimeo.best_stream.title
+    vimeo.streams
+
+    # Convert the video to WAV format
+    clip = mp.AudioFileClip(f"./{file_name}.mp4", fps=16000)
+    clip.write_audiofile(f"./audio/{file_name}.wav")
+    os.remove(f"./{file_name}.mp4")
+
+    return file_name
+
 def download_from_youtube(url:str) -> str:
     import moviepy.editor as mp
     from pytube import YouTube
@@ -85,4 +100,3 @@ def speech2text(file_name:str, model_name:str="tiny", extraction:bool=False) -> 
 
     print('Converting is complete')
     return file_name, language
-

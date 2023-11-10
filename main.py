@@ -11,12 +11,11 @@ def main():
     parser.add_argument('-c', '--chunk', default=2000, type=int, help='chunk size')
     parser.add_argument('-t', '--temperature', default=0.1, type=float, help='temperature of LLM')
     parser.add_argument('-b', '--batch', default=False, action="store_true", help='batch process')
-    parser.add_argument('-l', '--translated_language', default='zh-tw', help='the language that should be translated')
-    parser.add_argument('-e', '--extract', default=False, action="store_true", help='Extract human voice from audio (not support in Apple silicon)')
     parser.add_argument('-o', '--output_dir', default='./docx', type=str, help='file path of output report')
+    parser.add_argument('-l', '--translated_language', default='zh-tw', help='the language that should be translated')
     parser.add_argument('-v', '--vectorDB', default=None, choices=['pinecone', 'chroma', None], help='select the vectorDB')
-    parser.add_argument('-m', '--model', type=str, default='medium', help='the using model for ASR',
-                        choices=['tiny', 'base', 'small', 'medium', 'large-v2'])
+    parser.add_argument('-e', '--extract', default=False, action="store_true", help='Extract human voice from audio (not support in Apple silicon)')
+    parser.add_argument('-m', '--model', type=str, default='medium', help='the using model for ASR', choices=['tiny', 'base', 'small', 'medium', 'large-v2'])
 
     args = parser.parse_args()
 
@@ -33,7 +32,8 @@ def main():
         file_type, file_name = validation_and_filetype_check(file_path, args.output_dir)
         print(f'Strat analysis {file_name}')
         if file_type == 'url':
-            file_name = download_from_youtube(file_path)
+            if file_path.__contains__('youtube'): file_name = download_from_youtube(file_path)
+            elif file_path.__contains__('vimeo'): file_name = download_from_youtube(file_path)
             language = speech2text(file_name=file_name, model_name=args.model, extraction=args.extract)
         elif file_type == 'audio':
             language = speech2text(file_name=file_name, model_name=args.model, extraction=args.extract)
