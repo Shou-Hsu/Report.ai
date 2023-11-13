@@ -49,17 +49,46 @@ def validation_and_filetype_check(file_path:str, output_dir:str='./docx') ->str:
             if not os.path.exists(f'./audio/{file_name}.wav'):
                 shutil.copyfile(file_path, f'audio/{file_name}.wav')
             return 'audio', file_name
+        
+        elif file_path.endswith('.mp3'): 
+            # copy file to default folder
+            if not os.path.exists(f'./audio/{file_name}.mp3'):
+                shutil.copyfile(file_path, f'audio/{file_name}.mp3')
+            return 'audio', file_name
         else:
             raise ValueError(f'Please check input type is url or txt or wav')
         
     else: raise ValueError(f'Please check {file_path} is existed or not')
 
+def translate_chinese(llm:object, content:str="N/A", translated_language:str='zh-tw') -> str:
+    from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+    from langchain.docstore.document import Document
+    from langchain.prompts import PromptTemplate
+    from langchain.chains.llm import LLMChain
+    from langdetect import detect_langs
+    
+    if content == "N/A": return "N/A"
+    if str(detect_langs(content)[0]).split(':')[0] != translated_language:
+        doc = Document(page_content=content)
+        prompt_template = f"You are an experienced translator who will translate the content into {translated_language} if the given text is not in {translated_language}. \
+            You will translate the given text in a way that stays faithful to the original without adding much expansion and explanation. You will only return the translated text" "{text}"
+    
+        prompt = PromptTemplate.from_template(prompt_template)
+        llm_chain = LLMChain(llm=llm, prompt=prompt, return_final_only=True)
+
+        stuff_translate_chain = StuffDocumentsChain(  
+            llm_chain=llm_chain, document_variable_name="text")
+
+        return stuff_translate_chain.run([doc])
+    else:
+        return content
+        
 def detect_language(file_path:str) -> str:
     from langdetect import detect_langs
-
+    file_name = file_path.split('/')[-1].split('.')[0]
     with open(file_path,'r') as f:
         text = ''.join(f.readlines())
-    return str(detect_langs(text)[0]).split(':')[0]
+    return file_name, str(detect_langs(text)[0]).split(':')[0]
 
 def get_items(type:str):
     if type == 'individuel':

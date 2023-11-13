@@ -16,14 +16,14 @@ class divide_article():
 
     def _get_timestamp_list(self, article_timestamp:dict) -> list:
         timestamp_list = list()
-        for segment in article_timestamp.get('segments'):
-            for word in segment.get('words'):
-                texts = ''.join(re.split(r"\W+", word.get('text').strip()))
+        for chunk in article_timestamp.get('chunks'):
+            words = chunk.get('text')
+            texts = ''.join(re.split(r"\W+", words.strip()))
 
-                for text in texts: 
-                    start = word.get('start')
-                    end = word.get('end')
-                    timestamp_list.append((text, start, end))
+            for text in texts: 
+                start = chunk.get('timestamp')[0]
+                end = chunk.get('timestamp')[1]
+                timestamp_list.append((text, start, end))
         return timestamp_list
 
     def _add_timestamp(self, paragraphs:list) -> dict:      
@@ -83,7 +83,6 @@ class divide_article():
        
     def _divide_by_subtopics(self) -> dict:
         from langchain.text_splitter import RecursiveCharacterTextSplitter
-        from langchain.chains.summarize import load_summarize_chain
 
         text_splitter = RecursiveCharacterTextSplitter(
                             chunk_size = self.chunk_size,
@@ -96,7 +95,7 @@ class divide_article():
 
         # Define prompt
         prompt_template = "###You are a experimental researcher and \
-                            your task is to find out the subtopics and divide the article by subtopics.\
+                            your task is to find out the subtopics in detail and divide the article by subtopics.\
                             Please ensure that you do not overly fragment the content, and \
                             that each subtopic contains a sufficient amount of information.\
                             Begin by identifying the subtopics within the given text.\
@@ -132,9 +131,9 @@ class divide_article():
        # divide article 
         self._divide_by_subtopics()
        
-        # # fulfill transcript
+        # fulfill transcript
         article_full = self._add_transcript()
-
+        
         # add timestamp, base on whisper result 
         if os.path.exists(f'./transcript/{self.file_name}.json'):
             article_full = self._add_timestamp(article_full)

@@ -4,7 +4,6 @@ tqdm
 moviepy
 pytube
 pydub
-whisper_timestamped
 validators
 python-docx
 transformers
@@ -16,3 +15,4 @@ langdetect
 numba
 llvmlite
 numpy
+vimeo_downloader

@@ -1,9 +1,8 @@
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from utils import convert_json, get_items
 from langchain.docstore.document import Document
 from langchain.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
-from utils import convert_json, get_items
-from langdetect import detect_langs
 from tqdm import tqdm
 import json
 
@@ -67,23 +66,6 @@ class generate_summary():
 
         self.article_full = {**output, **article_divided}
 
-    def _translate_chinese(self, content:str) -> str:
-        if not content: return "N/A"
-        if str(detect_langs(content)[0]).split(':')[0] != self.translated_language:
-            doc = Document(page_content=content, metadata={"source": self.file_name})
-            prompt_template = f"You are an experienced translator who will translate the content into {self.translated_language} if the given text is not in {self.translated_language}. \
-                You will translate the given text in a way that stays faithful to the original without adding much expansion and explanation. You will only return the translated text" "{text}"
-        
-            prompt = PromptTemplate.from_template(prompt_template)
-            llm_chain = LLMChain(llm=self.llm, prompt=prompt, return_final_only=True)
-
-            stuff_translate_chain = StuffDocumentsChain(  
-                llm_chain=llm_chain, document_variable_name="text")
-
-            return stuff_translate_chain.run([doc])
-        else:
-            return content
-
     def _get_subtopic_summary(self) -> None:
         item_list, items, item_format = get_items('individuel')
 
@@ -126,6 +108,29 @@ class generate_summary():
         with open(f'./summary/{self.file_name}.json', 'w', encoding='utf-8') as f: json.dump(self.article_full, f, ensure_ascii=False)
         print("Analysis completed")
     
+    def _translate_chinese(self, content:str="N/A") -> str:
+        from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+        from langchain.docstore.document import Document
+        from langchain.prompts import PromptTemplate
+        from langchain.chains.llm import LLMChain
+        from langdetect import detect_langs
+        
+        if content == "N/A": return "N/A"
+        if str(detect_langs(content)[0]).split(':')[0] != self.translated_language:
+            doc = Document(page_content=content, metadata={"source": self.file_name})
+            prompt_template = f"You are an experienced translator who will translate the content into {self.translated_language} if the given text is not in {self.translated_language}. \
+                You will translate the given text in a way that stays faithful to the original without adding much expansion and explanation. You will only return the translated text" "{text}"
+        
+            prompt = PromptTemplate.from_template(prompt_template)
+            llm_chain = LLMChain(llm=self.llm, prompt=prompt, return_final_only=True)
+
+            stuff_translate_chain = StuffDocumentsChain(  
+                llm_chain=llm_chain, document_variable_name="text")
+
+            return stuff_translate_chain.run([doc])
+        else:
+            return content
+    
     def _translate_convert_docx(self) -> None:
         from utils import add_hyperlink, divide_audio
         import docx, datetime
@@ -134,13 +139,12 @@ class generate_summary():
         document = docx.Document()
 
         # translate general info and convert in docx
+        print('Translating')
         items_list, _, _ = get_items('general')
         for item in items_list:
             content = self._translate_chinese(self.article_full.get(item))
             document.add_heading(item, level=1)
             document.add_paragraph(content)
-
-        print('Translating')
         subtopics = self.article_full.get('Subtopics')
         with tqdm(total=len(subtopics)) as pbar:
             for subtopic in subtopics:
@@ -179,6 +183,4 @@ class generate_summary():
         self._get_subtopic_summary()
         
         # Translate and convert json to docx
-        # with open(f'./summary/{self.file_name}.json') as f: 
-        #     self.article_full = json.load(f)
         self._translate_convert_docx()
